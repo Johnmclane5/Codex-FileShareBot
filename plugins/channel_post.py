@@ -57,9 +57,10 @@ async def new_post(client: Client, message: Message):
     media = message.audio or message.video or message.document or message.photo
     caption = message.caption if message.caption else ""
     if message.video:
-        new_caption = f"<blockquote><b>{caption}</b></blockquote>\n<blockquote><b>{humanbytes(media.file_size)}</b></blockquote>"
-    else:
         new_caption = f"<blockquote><b>{caption}</b></blockquote>\n<blockquote><b>{humanbytes(media.file_size)}</b></blockquote>\n<blockquote><b>{TimeFormatter(media.duration)}</b></blockquote>"
+    else:
+        new_caption = f"<blockquote><b>{caption}</b></blockquote>\n<blockquote><b>{humanbytes(media.file_size)}</b></blockquote>"
+
     
     try:
         await asyncio.sleep(5)
