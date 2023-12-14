@@ -63,7 +63,7 @@ async def new_post(client: Client, message: Message):
 
     
     try:
-        await asyncio.sleep(5)
+        await asyncio.sleep(15)
                
         await client.send_message(NEW_CAPTIONS_CHANNEL_ID, text = new_caption , reply_markup=reply_markup)
 
