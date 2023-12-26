@@ -9,7 +9,7 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import FloodWait
 
 from bot import Bot
-from config import ADMINS, CHANNEL_ID, DISABLE_CHANNEL_BUTTON, NEW_CAPTIONS_CHANNEL_ID
+from config import ADMINS, CHANNEL_ID, DISABLE_CHANNEL_BUTTON
 from helper_func import encode
 from plugins.shorty import shorten_url, tiny
 
