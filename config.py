@@ -23,9 +23,16 @@ API_HASH = os.environ.get("API_HASH", "")
 #Your db channel Id
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", ""))
 
+#Your caption channel Id
+NEW_CAPTIONS_CHANNEL_ID = int(os.environ.get("NEW_CAPTIONS_CHANNEL_ID", ""))
 
 #OWNER ID
 OWNER_ID = int(os.environ.get("OWNER_ID", ""))
+
+
+#TMDB API
+TMDB_API_KEY = os.environ.get("TMDB_API_KEY", "")
+
 
 #Port
 PORT = os.environ.get("PORT", "8080")
@@ -86,3 +93,5 @@ logging.getLogger("pyrogram").setLevel(logging.WARNING)
 
 def LOGGER(name: str) -> logging.Logger:
     return logging.getLogger(name)
+
+NEW_CAPTIONS_CHANNEL_ID = int(os.environ.get("NEW_CAPTIONS_CHANNEL_ID", ""))

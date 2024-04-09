@@ -3,6 +3,9 @@
 import base64
 import re
 import asyncio
+import aiofiles
+import aiohttp
+from config import *
 from pyrogram import filters
 from pyrogram.enums import ChatMemberStatus
 from config import FORCE_SUB_CHANNEL, ADMINS
@@ -108,3 +111,90 @@ def get_readable_time(seconds: int) -> str:
 
 
 subscribed = filters.create(is_subscribed)
+
+async def download_movie_poster(file_id, movie_name, release_year):
+    tmdb_search_url = f'https://api.themoviedb.org/3/search/multi?api_key={TMDB_API_KEY}&query={movie_name}'
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(tmdb_search_url) as search_response:
+                search_data = await search_response.json()
+
+                if search_data['results']:
+                    # Filter results based on release year and first air date
+                    matching_results = [
+                        result for result in search_data['results']
+                        if ('release_date' in result and result['release_date'][:4] == str(release_year)) or
+                        ('first_air_date' in result and result['first_air_date'][:4] == str(
+                            release_year))
+                    ]
+
+                    if matching_results:
+                        result = matching_results[0]
+
+                        # Fetch additional details using movie ID
+                        movie_id = result['id']
+                        media_type = result['media_type']
+
+                        tmdb_movie_url = f'https://api.themoviedb.org/3/{media_type}/{movie_id}/images?api_key={TMDB_API_KEY}&language=en-US&include_image_language=en'
+
+                        async with session.get(tmdb_movie_url) as movie_response:
+                            movie_data = await movie_response.json()
+
+                        # Use the first backdrop image path from either detailed data or result
+                        backdrop_path = None
+                        if 'backdrops' in movie_data and movie_data['backdrops']:
+                            backdrop_path = movie_data['backdrops'][0]['file_path']
+                        elif 'backdrop_path' in result and result['backdrop_path']:
+                            backdrop_path = result['backdrop_path']
+
+                        # If both backdrop_path and poster_path are not available, use poster_path
+                        if not backdrop_path and 'poster_path' in result and result['poster_path']:
+                            poster_path = result['poster_path']
+                            poster_url = f"https://image.tmdb.org/t/p/original{poster_path}"
+
+                            async with session.get(poster_url) as poster_response:
+                                if poster_response.status == 200:
+                                    poster_path = f'poster_{file_id}.jpg'
+                                    async with aiofiles.open(poster_path, 'wb') as f:
+                                        await f.write(await poster_response.read())
+                                        return poster_path
+                        elif backdrop_path:
+                            backdrop_url = f"https://image.tmdb.org/t/p/original{backdrop_path}"
+
+                            async with session.get(backdrop_url) as backdrop_response:
+                                if backdrop_response.status == 200:
+                                    poster_path = f'backdrop_{file_id}.jpg'
+                                    async with aiofiles.open(poster_path, 'wb') as f:
+                                        await f.write(await backdrop_response.read())
+                                        return poster_path
+                        else:
+                            LOGGER.error(
+                                "Failed to obtain backdrop and poster paths from movie_data and result")
+
+                    else:
+                        LOGGER.info(
+                            f"No matching results found for movie: {movie_name} ({release_year})")
+
+                else:
+                    LOGGER.info(f"No results found for movie: {movie_name}")
+
+    except Exception as e:
+        LOGGER.error(f"Error fetching TMDB data: {e}")
+
+    return None
+
+async def extract_movie_info(caption):
+    try:
+        regex = re.compile(r'(.+?)(\d{4})')
+        match = regex.search(caption)
+
+        if match:
+            movie_name = match.group(1).replace('.', ' ').strip()
+            release_year = match.group(2)
+            return movie_name, release_year
+        
+    except Exception as e:
+        LOGGER.error(e)
+
+    return None, None
