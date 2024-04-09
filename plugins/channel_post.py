@@ -58,7 +58,7 @@ async def new_post(client: Client, message: Message):
         movie_name, release_year = await extract_movie_info(caption)
         poster_path = await download_movie_poster(file_id, movie_name, release_year)
     if message.video:
-         new_caption = f"<b>{caption}</b> <b>{humanbytes(media.file_size)}</b>\n<b>{shorty}</b>"
+         new_caption = f"<b>{caption}</b> <b>[{humanbytes(media.file_size)}]</b>\n<b>{shorty}</b>"
 
     try:
         await asyncio.sleep(5)
