@@ -12,7 +12,7 @@ urlshortx_api_token = os.environ.get('URL_SHORTENER_API_KEY')
 
 def shorten_url(url):
     try:
-        api_url = f"https://urlshortx.com/api"
+        api_url = f"https://modijiurl.com/api"
         params = {
             "api": urlshortx_api_token,
             "url": url,
