@@ -30,7 +30,7 @@ async def channel_post(client: Client, message: Message):
     string = f"get-{converted_id}"
     base64_string = await encode(string)
     link = f"https://t.me/{client.username}?start={base64_string}"
-    shorty = tiny(shorten_url(link))
+    shorty = shorten_url(link)
 
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("Get File", url=f'{shorty}')]])
 
@@ -51,7 +51,7 @@ async def new_post(client: Client, message: Message):
     string = f"get-{converted_id}"
     base64_string = await encode(string)
     link = f"https://t.me/{client.username}?start={base64_string}"
-    shorty = tiny(shorten_url(link))
+    shorty = shorten_url(link)
     reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("Send in DM", url=f'{shorty}')]])
 
     media = message.audio or message.video or message.document or message.photo
